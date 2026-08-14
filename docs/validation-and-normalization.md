@@ -67,9 +67,8 @@ Rules:
 - convert to lowercase
 - validate basic email structure
 - invalid emails must not stop the entire workflow
-- when invalid, store `null` and flag the record with:
-
-`validationStatus = invalid_email`
+- when invalid, store `null`
+- flag the record with `validationStatus = invalid_email`
 
 ---
 
@@ -89,11 +88,11 @@ Rules:
 
 Example:
 
-`+55 (31) 99999-1001`
+    +55 (31) 99999-1001
 
 becomes:
 
-`5531999991001`
+    5531999991001
 
 ---
 
@@ -101,15 +100,13 @@ becomes:
 
 Source values:
 
-`active`
-
-`inactive`
+- `active`
+- `inactive`
 
 Target values:
 
-`ACTIVE`
-
-`INACTIVE`
+- `ACTIVE`
+- `INACTIVE`
 
 Rules:
 
@@ -159,11 +156,76 @@ A malformed optional field should not interrupt the entire synchronization batch
 
 Example:
 
-```text
-Batch with 100 records
+    Batch with 100 records
+            ↓
+    98 valid
+    2 invalid email
+            ↓
+    98 processed normally
+    2 processed without email and flagged
+
+Critical validation failures, such as a missing external identifier, should route the record to the error handling workflow.
+
+---
+
+## Record-Level Processing
+
+The validation layer should isolate errors per record rather than treating the entire batch as invalid.
+
+Example:
+
+    Input batch
         ↓
-98 valid
-2 invalid email
+    Record validation
         ↓
-98 processed normally
-2 processed without email and flagged
+    ┌────────────────────┐
+    │ Valid record       │ → Continue processing
+    │ Invalid optional   │ → Normalize + flag
+    │ Critical failure   │ → Error handling
+    └────────────────────┘
+
+This approach improves resilience and prevents one malformed record from blocking unrelated valid records.
+
+---
+
+## Normalization Flow
+
+The normalization stage should transform source fields into the target CRM format before any upsert operation.
+
+Example:
+
+    External API record
+            ↓
+    Trim values
+            ↓
+    Normalize phone
+            ↓
+    Normalize email
+            ↓
+    Normalize status
+            ↓
+    Assign validation status
+            ↓
+    CRM-ready payload
+
+---
+
+## Data Quality Principles
+
+The synchronization process should follow these principles:
+
+- never assume source data is perfectly formatted
+- validate required identifiers before processing
+- normalize fields consistently
+- preserve useful data whenever possible
+- avoid discarding an entire record because of a non-critical invalid field
+- isolate critical failures for investigation
+- never expose sensitive information in logs
+
+---
+
+## Design Principle
+
+The synchronization pipeline should be resilient to bad data.
+
+The goal is not to assume perfect source data, but to safely process valid information while isolating problematic records for later review.
