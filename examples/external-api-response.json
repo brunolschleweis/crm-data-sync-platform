@@ -1,0 +1,35 @@
+{
+  "page": 1,
+  "pageSize": 3,
+  "totalPages": 2,
+  "totalRecords": 6,
+  "data": [
+    {
+      "customerId": "CUS-1001",
+      "name": "Ana Martins",
+      "email": "ana.martins@example.com",
+      "phone": "+5531999991001",
+      "document": "12345678901",
+      "status": "active",
+      "updatedAt": "2026-08-14T10:15:00-03:00"
+    },
+    {
+      "customerId": "CUS-1002",
+      "name": "Carlos Ribeiro",
+      "email": "carlos.ribeiro@example.com",
+      "phone": "+5531999991002",
+      "document": "98765432100",
+      "status": "active",
+      "updatedAt": "2026-08-14T10:16:00-03:00"
+    },
+    {
+      "customerId": "CUS-1003",
+      "name": "Mariana Souza",
+      "email": "invalid-email",
+      "phone": "+5531999991003",
+      "document": "45678912300",
+      "status": "inactive",
+      "updatedAt": "2026-08-14T10:17:00-03:00"
+    }
+  ]
+}
